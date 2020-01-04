@@ -3,6 +3,7 @@ filebeat.inputs:
   enabled: true
   paths:
     - /var/log/auth.log
+  include_lines: ['Connection closed by authenticating user']
 
 processors:
 - add_host_metadata:
