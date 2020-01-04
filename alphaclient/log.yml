@@ -1,0 +1,16 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/auth.log
+
+processors:
+- add_host_metadata:
+    netinfo.enabled: true
+    cache.ttl: 5m
+
+output.redis:
+  key: "filebeat"
+  db: 0
+  timeout: 5
+  datatype: list

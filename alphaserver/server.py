@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
 import redis
 import json
+import os
 from collections import Counter
 
 app = Flask(__name__)
+passwd = os.environ["redis_pwd"] 
 @app.route('/', methods = ['GET'])
 def monit():
-  r = redis.Redis()
+  r = redis.StrictRedis(host="localhost", port=6379, db=0, password=passwd)
   l = r.lrange('filebeat', 0, -1)
   val=[]
   arr=[]
