@@ -1,6 +1,6 @@
 ## config for alphaserver ##
 
-# setup redis
+###### setup redis ######
 redisv='5.0.7'
 redis_pass='devops'
 proc=$(nproc)
@@ -9,12 +9,27 @@ tar xfvz /tmp/redis.tar.gz -C /tmp
 sh -c "cd /tmp/redis-$redisv/ && make -j $proc"
 ## running redis as daemon
 /tmp/redis-$redisv/src/redis-server ./alphaserver/redis.conf
-echo "sleep 5 sec for waiting to up"
+echo "wait 5 second to start"
 sleep 5
 ## set auth for redis
-/tmp/redis-$redisv/src/redis-cli config set requirepass $redis_pass
+status=$(ps uax | grep alphaserver | grep -v grep)
+if [ "$status" ]; then
+	/tmp/redis-$redisv/src/redis-cli config set requirepass $redis_pass
+else
+        clear;
+        echo "REDIS not running";
+	sleep 3;
+	exit
+fi
 
-# setup flask and app
+###### setup flask and app ######
 pip install flask
 screen -dmS flask -m -d /bin/sh ./alphaserver/run.sh $redis_pass
-echo "APP is running.."
+status=$(ps uax | grep alphaserver | grep -v grep)
+if [ "$status" ]; then
+	clear;
+	echo "APP Running as well";
+else
+	clear;
+	echo "APP not running";
+fi

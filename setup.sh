@@ -17,5 +17,5 @@ ssh root@$master "git clone https://github.com/ahdianrawuli/gjk-tst.git /tmp/gjk
 IFS=',' read -r -a array <<< "$node"
 for i in "${array[@]}";
 do
-	ssh root@$node "git clone https://github.com/ahdianrawuli/gjk-tst.git /tmp/gjk-node;cd /tmp/gjk-node;/bin/bash alphaclient.sh"
+	ssh root@$i "git clone https://github.com/ahdianrawuli/gjk-tst.git /tmp/gjk-node;cd /tmp/gjk-node;/bin/bash alphaclient.sh $master"
 done
