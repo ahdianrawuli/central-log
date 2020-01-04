@@ -1,20 +1,21 @@
-## config for alphaserver ##
+while [ "$1" != "" ]; do
+    case $1 in
+        -s | --alphaserver)     shift
+                                master=$1
+                                ;;
+        -c | --alphaclient)     shift
+                                node=$1
+                                ;;
+    esac
+    shift
+done
 
-# setup redis
-redisv='5.0.7'
-redis_pass='devops'
-proc=$(nproc)
-wget http://download.redis.io/releases/redis-$redisv.tar.gz -O /tmp/redis.tar.gz
-tar xfvz /tmp/redis.tar.gz -C /tmp
-sh -c "cd /tmp/redis-$redisv/ && make -j $proc"
-## running redis as daemon
-/tmp/redis-$redisv/src/redis-server ./alphaserver/redis.conf
-echo "sleep 5 sec for waiting to up"
-sleep 5
-## set auth for redis
-/tmp/redis-$redisv/src/redis-cli config set requirepass $redis_pass
+## setup alphaserver ##
+ssh root@$master "git clone https://github.com/ahdianrawuli/gjk-tst.git /tmp/gjk-master;cd /tmp/gjk-master;/bin/bash alphaserver.sh"
 
-# setup flask and app
-pip install flask
-screen -dmS flask -m -d /bin/sh ./alphaserver/run.sh $redis_pass
-echo "APP is running.."
+## setup alphaclient ##
+IFS=',' read -r -a array <<< "$node"
+for i in "${array[@]}";
+do
+	ssh root@$node "git clone https://github.com/ahdianrawuli/gjk-tst.git /tmp/gjk-node;cd /tmp/gjk-node;/bin/bash alphaclient.sh"
+done
