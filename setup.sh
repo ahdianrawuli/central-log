@@ -52,3 +52,5 @@ do
         fi
 "
 done
+
+echo -e "\r\nCheck the metrics ssh attempts in http://$master:5555";
