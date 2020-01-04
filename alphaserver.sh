@@ -1,6 +1,10 @@
 ## config for alphaserver ##
 
 ###### setup redis ######
+
+## stop redis running
+pkill -9 redis
+## compile redis
 redisv='5.0.7'
 redis_pass='devops'
 proc=$(nproc)
@@ -23,6 +27,10 @@ else
 fi
 
 ###### setup flask and app ######
+
+## stop flask
+pkill -9 flask
+## install app
 pip install flask
 screen -dmS flask -m -d /bin/sh ./alphaserver/run.sh $redis_pass
 status=$(ps uax | grep alphaserver | grep -v grep)
