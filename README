@@ -1,8 +1,8 @@
-### ssh log-in attempts ###
+### Native Central Log ###
 
 [0] Pre-Install
 
- In this main folder there are 2 folders namely alphaserver as "master" and alphaclient as "node".
+ In main folder there are 2 folders alphaserver as "master" and alphaclient as "node".
 
  Inside the "master", support tools such as redis and flask will be installed automatically through the shell script.
 
@@ -16,7 +16,7 @@
 	- make
 
  * We assume that all SSH ports on master and nodes are port 22
- * All users used for installation on each master and node are root users
+ * All users used for installation on each master and node are root users or sudoers
  * Internet network at each master and node is running well. Because there are several packages that will be downloaded from the official (filebeat and redis)
 
 [1] Manual Install
@@ -68,7 +68,7 @@
 
  You can see the APP at http://[IP_MASTER]:5555
 
- [3] What I did
+ [3] How Work ?
 
    1. specifies a pattern for failed SSH log-in attempts from /var/log/auth.log. attempt failed when log-in failed in 1 session.
 
