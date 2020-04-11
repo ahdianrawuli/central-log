@@ -10,6 +10,8 @@ processors:
     netinfo.enabled: true
     cache.ttl: 5m
 
-output.file:
-  path: "/tmp"
-  filename: filebeat.log
+output.redis:
+  key: "filebeat"
+  db: 0
+  timeout: 5
+  datatype: list
