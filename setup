@@ -1,0 +1,80 @@
+#!/bin/bash
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -m | --alphaserver)     shift
+                                master=$1
+                                ;;
+        -n | --alphaclient)     shift
+                                node=$1
+                                ;;
+        -t | --type)       	shift
+                                type=$1
+                                ;;
+    esac
+    shift
+done
+
+## Set Redis Password ##
+redis_pass='devops'
+
+if [ -z "$master" ] || [ -z "$node" ] || [ -z "$type" ];then
+	clear;
+        echo "Command not valid";
+        exit;
+
+elif [ "$master" ] && [ "$node" ] && [ "$type" = "install" ];then
+	clear;
+	echo "installing master ($master)";
+	sleep 2;
+	## setup alphaserver ##
+	tar -C . -cf - alphaserver | ssh root@$master -p 22 "tar -C /tmp -xvf -;cd /tmp/alphaserver; chown -R root:root /opt/alphaserver; /bin/bash setup.sh $redis_pass"
+
+	## setup alphaclient ##
+	IFS=',' read -r -a array <<< "$node"
+	for i in "${array[@]}";
+	do
+		clear;
+		echo "installing node ($i)";
+		sleep  2;
+		tar -C . -cf - alphaclient | ssh root@$i -p 22 "tar -C /tmp -xvf -;cd /tmp/alphaclient; chown -R root:root /opt/alphaclient; /bin/bash setup.sh $master $redis_pass"
+	done
+	echo -e "\r\nInstallation is complete";
+elif [ "$master" ] && [ "$node" ] && [ "$type" = "check" ];then
+	clear;
+	echo -e "check if master or node can ssh without password\r\n";
+	check=$(ssh -q -o PasswordAuthentication=no root@$master -p 22 id);
+	if [ "$check" ]; then
+		echo "Master ($master) -> Yes";
+	else
+		echo "Master ($master) -> No";
+	fi
+
+        IFS=',' read -r -a array <<< "$node"
+        for i in "${array[@]}";
+        do
+		check=$(ssh -q -o PasswordAuthentication=no root@$i -p 22 id);
+        	if [ "$check" ]; then
+                	echo "Node ($i) -> Yes";
+        	else
+                	echo "Node ($i) -> No";
+        	fi
+        done
+elif [ "$master" ] && [ "$node" ] && [ "$type" = "uninstall" ];then
+	clear;
+	ssh root@$master -p 22 "pkill -9 flask;pkill -9 redis; rm -rf /tmp/alphaserver; rm -rf /tmp/redis*";
+	echo "uninstall master ($master) successfully";
+	sleep 2;
+
+        IFS=',' read -r -a array <<< "$node"
+        for i in "${array[@]}";
+        do
+		ssh root@$i -p 22 "pkill -9 filebeat; rm -rf /tmp/alphaclient";
+		echo "uninstall node ($i) successfully";
+		sleep 2;
+        done
+	echo -e "\r\nUninstall is complete";
+else
+	clear;
+	echo "type not available";
+fi

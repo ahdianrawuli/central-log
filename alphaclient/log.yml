@@ -3,15 +3,13 @@ filebeat.inputs:
   enabled: true
   paths:
     - /var/log/auth.log
-  include_lines: ['Connection closed by authenticating user']
+  include_lines: ['Connection closed by authenticating user','Connection closed by invalid user']
 
 processors:
 - add_host_metadata:
     netinfo.enabled: true
     cache.ttl: 5m
 
-output.redis:
-  key: "filebeat"
-  db: 0
-  timeout: 5
-  datatype: list
+output.file:
+  path: "/tmp"
+  filename: filebeat.log

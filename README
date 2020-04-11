@@ -1,0 +1,86 @@
+### ssh log-in attempts ###
+
+[0] Pre-Install
+
+ In this main folder there are 2 folders namely alphaserver as "master" and alphaclient as "node".
+
+ Inside the "master", support tools such as redis and flask will be installed automatically through the shell script.
+
+ Inside the "node", support tools such as filebeat will be installed automatically through the shell script.
+
+ Before you start, you need to install to each master and nodes:
+
+	- screen
+	- python
+	- pip
+	- make
+
+ * We assume that all SSH ports on master and nodes are port 22
+ * All users used for installation on each master and node are root users
+ * Internet network at each master and node is running well. Because there are several packages that will be downloaded from the official (filebeat and redis)
+
+[1] Manual Install
+
+[1.1] Install Master
+
+~$ ssh root@[IP_MASTER]
+~$ cd alphaserver
+~$ ./setup.sh [REDIS_PASSWORD]
+
+ if successful, you will see a message like this :
+
+	[ APP running at http://[IP_MASTER]:5555 ]
+
+[1.2] Install Node
+
+ ~$ ssh root@[IP_NODE]
+ ~$ cd alphaclient
+ ~$ ./setup.sh [IP_MASTER] [REDIS_PASSWORD]
+
+ if successful, you will see a message like this :
+
+	[ Filebeat running as well ]
+
+ if you have multiple nodes, repeat step [1.2] with a different IP_NODE
+
+[2] Auto Install
+
+ In this main folder there is a shell script with the name "setup".
+
+ The default redis password is 'devops'. You can change it in the "setup" file on the 'redis_pass' variable
+
+ Usage :
+
+	~$ ./setup -m [IP_MASTER] -n [IP_NODE_1,IP_NODE_2,IP_NODE_N] -t [TYPE]
+
+ Example :
+
+	for high automation, make sure your host can do SSH without a password to the master and nodes
+
+	## check master and nodes can log in without a password
+	~$ ./setup -m xxx.xxx.xxx.xxx -n yyy.yyy.yyy.yyy,zzz.zzz.zzz.zzz -t check
+
+	## install master and node
+	~$ ./setup -m xxx.xxx.xxx.xxx -n yyy.yyy.yyy.yyy,zzz.zzz.zzz.zzz -t install
+
+	## uninstall master and node
+	~$ ./setup -m xxx.xxx.xxx.xxx -n yyy.yyy.yyy.yyy,zzz.zzz.zzz.zzz -t uninstall
+
+ You can see the APP at http://[IP_MASTER]:5555
+
+ [3] What I did
+
+   1. specifies a pattern for failed SSH log-in attempts from /var/log/auth.log. attempt failed when log-in failed in 1 session.
+
+      the pattern is : ['Connection closed by authenticating user','Connection closed by invalid user']
+
+   2. collect log metrics using filebeat and send them to redis
+	
+   3. the "master" APP will take the metrics from the redis and process it
+
+   4. then the results of the processing will be displayed to HTTP
+ 
+ 
+ Thank You
+
+ Ahdian Rawuli

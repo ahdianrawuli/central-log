@@ -8,4 +8,4 @@ export FLASK_APP=./server.py
 
 export redis_pwd=$1
 
-flask run -h 0.0.0.0 -p 5555
+flask run -h 0.0.0.0 -p 4444

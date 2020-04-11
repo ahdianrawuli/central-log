@@ -15,11 +15,11 @@ def monit():
   for x in l:
     data=(json.loads(x))
     string = data['message']
-    error=['Connection closed by authenticating user']
+    error=['Connection closed by authenticating user','Connection closed by invalid user']
     if any(x in string for x in error):
       val.append(str(data['host']['name']+' ('+data['host']['ip'][0]+')'))
   c = dict(Counter(val) )
-  title = 'Metrics for ssh log-in attempts<br>'
+  title = 'Metrics for ssh log-in attempts<br><br>'
   for resp in c.items():
     arr.append('* '+resp[0]+' had '+str(resp[1])+' attempt')
   listToStr = '<br>'.join(map(str, arr)) 
